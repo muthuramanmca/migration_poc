@@ -52,12 +52,12 @@ The migration follows a strict spec-first discipline: **no .NET code is written 
 | Products | 2 | Spec Validated |
 | Orders | 3 | Spec Ready for Review |
 
-**The workflow per slice:**
+**The workflow per slice** (step IDs match `Java-to-DotNetCore-Migration-Plan.md` Section 4):
 1. Read the relevant Java source from `java-api/src/main/java/com/example/dummyapi/<domain>/`
-2. Write the behavior spec to `migration_support/specs/<N>-<slice>-spec.md` (Phase 3a — "Understand")
+2. Write the behavior spec to `migration_support/specs/<N>-<slice>-spec.md` (`03_01` — create slice behaviour doc)
 3. Set `migration-tracker.csv` status to `Spec Ready for Review` and present it in chat
-4. User validates; status becomes `Spec Validated` (or `Rework Needed` if corrections are needed)
-5. Only after all specs are validated does .NET code generation begin (Phase 3 step 3)
+4. User validates; status becomes `Spec Validated` (or `Rework Needed` if corrections are needed) — this is `03_02`, the manual approval gate
+5. Only after all specs are validated does .NET code generation begin (`04_02` — generate code)
 
 ---
 

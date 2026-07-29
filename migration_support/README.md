@@ -15,7 +15,7 @@
 - **`specs/`** — will hold one behavior-spec document per slice, created as
   we migrate each one (doesn't exist yet — created when the first spec is written).
 
-## Migration order (Phase 2b — dependency-based, already applied in the tracker)
+## Migration order (`02` — dependency-based, already applied in the tracker)
 
 1. **Auth/Users** — foundational, no dependencies. Migrate first.
 2. **Products** — no dependencies on other slices. Can go second (or in
@@ -46,7 +46,8 @@ generation yet, per your instruction that we're doing spec creation only.
    one at the top of `migration-tracker.csv` that's still `Not Started`).
 2. I set that row's Status to `Spec In Progress`, read the relevant Java
    source directly from `java-api/`, and write the behavior spec to
-   `specs/<order>-<slice-name>-spec.md` (Phase 3a step 1 — Understand).
+   `specs/<order>-<slice-name>-spec.md` (`03_01` — create slice behaviour doc,
+   per `Java-to-DotNetCore-Migration-Plan.md` Section 4).
 3. I set Status to `Spec Ready for Review` and post the spec here in chat
    for you to read.
 4. You do the manual validation. If something's wrong, tell me what and I
