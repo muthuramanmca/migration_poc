@@ -67,4 +67,32 @@ class ProductServiceTest {
                 .isInstanceOf(ApiException.class)
                 .hasMessageContaining("negative");
     }
+
+    @Test
+    void delete_deactivatesProductInsteadOfRemovingIt() {
+        Product product = new Product("SKU-5", "Thingamajig", "desc", BigDecimal.TEN, 5);
+        when(productRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(product));
+
+        productService.delete(1L);
+
+        assertThat(product.isActive()).isFalse();
+    }
+
+    @Test
+    void delete_throwsNotFoundWhenAlreadyDeactivated() {
+        when(productRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.delete(1L))
+                .isInstanceOf(ApiException.class)
+                .hasMessageContaining("not found");
+    }
+
+    @Test
+    void findOrThrow_excludesDeactivatedProducts() {
+        when(productRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> productService.getById(1L))
+                .isInstanceOf(ApiException.class)
+                .hasMessageContaining("not found");
+    }
 }

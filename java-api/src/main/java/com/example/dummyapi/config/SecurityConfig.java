@@ -38,6 +38,7 @@ public class SecurityConfig {
                 // Admin-only: catalog and fulfilment mutations
                 .requestMatchers("POST", "/api/products/**").hasRole("ADMIN")
                 .requestMatchers("PUT", "/api/products/**").hasRole("ADMIN")
+                .requestMatchers("DELETE", "/api/products/**").hasRole("ADMIN")
                 .requestMatchers("POST", "/api/orders/*/ship").hasRole("ADMIN")
                 .requestMatchers("POST", "/api/orders/*/deliver").hasRole("ADMIN")
                 // Everything else requires a logged-in user

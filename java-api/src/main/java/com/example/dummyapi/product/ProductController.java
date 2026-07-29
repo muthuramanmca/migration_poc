@@ -5,6 +5,7 @@ import com.example.dummyapi.product.dto.ProductDtos.ProductResponse;
 import com.example.dummyapi.product.dto.ProductDtos.StockAdjustmentRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -43,5 +44,11 @@ public class ProductController {
     @PutMapping("/{id}/stock")
     public ProductResponse adjustStock(@PathVariable Long id, @RequestBody StockAdjustmentRequest request) {
         return productService.adjustStock(id, request);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> delete(@PathVariable Long id) {
+        productService.delete(id);
+        return ResponseEntity.noContent().build();
     }
 }

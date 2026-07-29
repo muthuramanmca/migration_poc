@@ -43,7 +43,13 @@ public class ProductService {
     }
 
     public List<ProductResponse> listAll() {
-        return productRepository.findAll().stream().map(this::toResponse).toList();
+        return productRepository.findAllByActiveTrue().stream().map(this::toResponse).toList();
+    }
+
+    @Transactional
+    public void delete(Long id) {
+        Product product = findOrThrow(id);
+        product.deactivate();
     }
 
     @Transactional
@@ -62,9 +68,13 @@ public class ProductService {
         return toResponse(product);
     }
 
-    /** Public: used by OrderService (a different package) to reserve/restock within a transaction. */
+    /**
+     * Public: used by OrderService (a different package) to reserve/restock within a transaction.
+     * Excludes deactivated products, so a soft-deleted product is 404 everywhere, including new
+     * order creation, the same as if the row didn't exist.
+     */
     public Product findOrThrow(Long id) {
-        Product product = productRepository.findById(id)
+        Product product = productRepository.findByIdAndActiveTrue(id)
                 .orElseThrow(() -> ApiException.notFound("PRODUCT_NOT_FOUND", "Product not found: " + id));
         product.setLowStockThreshold(lowStockThreshold);
         return product;

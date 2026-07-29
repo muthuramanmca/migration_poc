@@ -33,6 +33,9 @@ public class Product {
     @Column(nullable = false)
     private int stockQuantity;
 
+    @Column(nullable = false)
+    private boolean active = true;
+
     // Populated at read-time by ProductService from application.yml
     // (app.products.low-stock-threshold) -- not persisted.
     @Transient
@@ -71,10 +74,20 @@ public class Product {
         this.stockQuantity += quantity;
     }
 
+    /**
+     * Soft-delete: deactivated products are excluded from listings/lookups but
+     * the row (and its id) is preserved so past OrderItem.unitPriceAtPurchase
+     * snapshots stay intact.
+     */
+    public void deactivate() {
+        this.active = false;
+    }
+
     public Long getId() { return id; }
     public String getSku() { return sku; }
     public String getName() { return name; }
     public String getDescription() { return description; }
     public BigDecimal getPrice() { return price; }
     public int getStockQuantity() { return stockQuantity; }
+    public boolean isActive() { return active; }
 }
