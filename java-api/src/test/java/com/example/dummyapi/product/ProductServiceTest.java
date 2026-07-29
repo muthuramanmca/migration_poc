@@ -61,7 +61,7 @@ class ProductServiceTest {
     @Test
     void adjustStock_rejectsNegativeResultingQuantity() {
         Product product = new Product("SKU-4", "Doohickey", "desc", BigDecimal.TEN, 5);
-        when(productRepository.findById(1L)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdAndActiveTrue(1L)).thenReturn(Optional.of(product));
 
         assertThatThrownBy(() -> productService.adjustStock(1L, new StockAdjustmentRequest(-10)))
                 .isInstanceOf(ApiException.class)
