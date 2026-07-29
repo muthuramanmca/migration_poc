@@ -76,15 +76,15 @@ flowchart TD
 
 | Step | Name | Input | Output | Manual? |
 |---|---|---|---|---|
-| `01` | Setup .NET Skeleton | Target stack preferences, if any (otherwise defaults below) | .NET solution skeleton, ADR doc, cross-cutting scaffolding | — |
-| `02` | Create Java API Contract | Running Java app (`java-api/`) with an OpenAPI generator wired up | OpenAPI contract export, endpoint inventory grouped by slice, dependency-ordered slice queue/tracker | — |
-| `03_01` | Create Java API Slice Behaviour Doc | Java source for the slice (Controller/Service/Repository/Entity/DTOs), that slice's portion of the `02` contract, existing JUnit tests | Behavior spec markdown (`migration_support/specs/<n>-<slice>-spec.md`) | — |
-| `03_02` | Manual Approve Behaviour Doc | Behavior spec from `03_01` | Tracker status → `Spec Validated`, or → `Rework Needed` back to `03_01` | **manual** |
-| `04_01` | .NET Slice Design Note | Approved spec (`03_02`) + `01`'s conventions | Design note — endpoint route, DTO shapes, service interface signature, EF Core entity changes | — |
-| `04_02` | .NET Slice Generate Code | Design note (`04_01`) + approved spec | Working .NET implementation (Controller, Service impl, EF Core entity/migration, DTOs, validators) | — |
-| `04_03` | .NET Slice Unit Test Code | The approved spec (**not** the generated code) | xUnit/NUnit test suite covering spec rules + edge cases | — |
-| `04_04` | Java/.NET Compare Test Result | `.NET` test results (`04_03` vs `04_02`) + optional Java/.NET side-by-side diff | Pass/fail report + behavioral diff report | — |
-| `04_05` | .NET Code Review | Generated code (`04_02`) + verify results (`04_04`) | Reviewed/approved code | **manual** |
+| `01` | Setup .NET Skeleton | Target stack preferences<br>(otherwise defaults below) | .NET solution skeleton<br>ADR doc<br>Cross-cutting scaffolding | — |
+| `02` | Create Java API Contract | Running `java-api/`<br>with OpenAPI generator wired up | OpenAPI contract export<br>Endpoint inventory (by slice)<br>Dependency-ordered slice queue | — |
+| `03_01` | Create Java API Slice Behaviour Doc | Java source for the slice<br>Slice's portion of `02` contract<br>Existing JUnit tests | Behavior spec markdown<br>(`migration_support/specs/`) | — |
+| `03_02` | Manual Approve Behaviour Doc | Behavior spec from `03_01` | Status → `Spec Validated`<br>or → `Rework Needed` | **manual** |
+| `04_01` | .NET Slice Design Note | Approved spec (`03_02`)<br>+ `01`'s conventions | Design note:<br>route, DTOs, service interface,<br>EF Core entity changes | — |
+| `04_02` | .NET Slice Generate Code | Design note (`04_01`)<br>+ approved spec | .NET implementation:<br>Controller, Service, EF Core entity,<br>DTOs, validators | — |
+| `04_03` | .NET Slice Unit Test Code | Approved spec<br>(**not** the generated code) | xUnit/NUnit tests<br>(spec rules + edge cases) | — |
+| `04_04` | Java/.NET Compare Test Result | .NET test results<br>+ optional Java/.NET diff | Pass/fail report<br>+ behavioral diff | — |
+| `04_05` | .NET Code Review | Generated code (`04_02`)<br>+ verify results (`04_04`) | Reviewed/approved code | **manual** |
 | `05` | Cross-Cutting & Integration | *TBD* | *TBD* | **partial_manual** |
 | `06` | Validation Strategy | *TBD* | *TBD* | **partial_manual** |
 | `07` | Cutover | *TBD* | *TBD* | **manual** |
