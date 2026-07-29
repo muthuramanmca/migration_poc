@@ -253,9 +253,3 @@ A rewrite is the one chance to fix things a straight port would carry over uncha
 - **API versioning from the first release** (`Asp.Versioning.Http`) so later modules can evolve without breaking already-migrated consumers.
 - **Feature flags** for the cutover itself (even a simple config-based flag), giving you a faster rollback lever than a full gateway re-route if a freshly migrated module misbehaves in production.
 - Treat the **`02` OpenAPI spec as living documentation**, not a one-time export — regenerate and diff it on every change so the contract and the code can't silently drift apart.
-
----
-
-## Suggested Next Step
-
-Generate the dummy Java app (or a first realistic module of it) and run it through Phases 2–3 once, end to end, as a template — that gives a concrete, reusable pattern before scaling to the rest of the "app."
