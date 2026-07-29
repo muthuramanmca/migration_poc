@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.example</groupId>
-    <artifactId>dummy-api</artifactId>
+    <artifactId>java-api</artifactId>
     <version>0.1.0</version>
-    <name>dummy-api</name>
+    <name>java-api</name>
     <description>
         Dummy Spring Boot REST API (Auth/Users, Products, Orders) used as a stand-in
         source application for the Java -&gt; .NET Core migration process.
