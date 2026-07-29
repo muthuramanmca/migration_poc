@@ -1,0 +1,25 @@
+package com.example.dummyapi.user.dto;
+
+import com.example.dummyapi.common.ValidPassword;
+import com.example.dummyapi.user.Role;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
+
+public class UserDtos {
+
+    public record RegisterRequest(
+            @NotBlank @Size(min = 3, max = 30) String username,
+            @NotBlank @Email String email,
+            @ValidPassword String password
+    ) {}
+
+    public record LoginRequest(
+            @NotBlank String username,
+            @NotBlank String password
+    ) {}
+
+    public record AuthResponse(String token, long expiresInSeconds) {}
+
+    public record UserResponse(Long id, String username, String email, Role role) {}
+}

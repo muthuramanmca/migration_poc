@@ -1,0 +1,4 @@
+Order,Slice,Depends On,Endpoint Count,Status,Spec Doc,Validated By,Validated Date,Notes
+1,Auth/Users,-,3,Spec Validated,specs/01-auth-users-spec.md,Muthu,,Foundational - no dependencies; migrate first
+2,Products,-,4,Spec Validated,specs/02-products-spec.md,Muthu,,No dependencies on other slices
+3,Orders,"Auth/Users, Products",7,Spec Ready for Review,specs/03-orders-spec.md,,,Needs both prior slices in place to build/test against

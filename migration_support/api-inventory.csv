@@ -1,0 +1,15 @@
+Slice,Method,Path,Operation ID,Auth Requirement,Request DTO,Response DTO
+Auth/Users,POST,/api/auth/register,register,Public,RegisterRequest,UserResponse
+Auth/Users,POST,/api/auth/login,login,Public,LoginRequest,AuthResponse
+Auth/Users,GET,/api/users/me,me,Authenticated,-,UserResponse
+Products,GET,/api/products,list,Public,-,ProductResponse[]
+Products,GET,/api/products/{id},get,Public,-,ProductResponse
+Products,POST,/api/products,create,Admin,ProductRequest,ProductResponse
+Products,PUT,/api/products/{id}/stock,adjustStock,Admin,StockAdjustmentRequest,ProductResponse
+Orders,GET,/api/orders,list_1,Authenticated,-,OrderResponse[]
+Orders,POST,/api/orders,create_1,Authenticated,OrderRequest,OrderResponse
+Orders,GET,/api/orders/{id},get_1,"Authenticated (owner or admin)",-,OrderResponse
+Orders,POST,/api/orders/{id}/pay,pay,"Authenticated (owner or admin)",-,OrderResponse
+Orders,POST,/api/orders/{id}/ship,ship,Admin,-,OrderResponse
+Orders,POST,/api/orders/{id}/deliver,deliver,Admin,-,OrderResponse
+Orders,POST,/api/orders/{id}/cancel,cancel,"Authenticated (owner or admin)",-,OrderResponse

@@ -1,0 +1,17 @@
+# Java (java-api)
+java-api/target/
+*.class
+
+# .NET (dotnet-api)
+dotnet-api/**/bin/
+dotnet-api/**/obj/
+
+# IDE / editor
+.idea/
+*.iml
+.vscode/
+.vs/
+
+# OS
+.DS_Store
+Thumbs.db
