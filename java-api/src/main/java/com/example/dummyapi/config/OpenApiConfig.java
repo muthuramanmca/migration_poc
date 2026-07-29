@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @OpenAPIDefinition(
         info = @Info(
-                title = "Dummy API",
+                title = "Java API",
                 version = "0.1.0",
                 description = "Sample Auth/Users, Products and Orders API used as the source " +
                         "application for the Java -> .NET Core migration exercise. " +
