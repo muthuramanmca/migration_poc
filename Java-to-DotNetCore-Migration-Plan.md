@@ -74,8 +74,22 @@ flowchart TD
     P04 --> P05 --> P06 --> P07
 ```
 
+| Step | Name | Input | Output | Manual? |
+|---|---|---|---|---|
+| `01` | Setup .NET Skeleton | Target stack preferences, if any (otherwise defaults below) | .NET solution skeleton, ADR doc, cross-cutting scaffolding | — |
+| `02` | Create Java API Contract | Running Java app (`java-api/`) with an OpenAPI generator wired up | OpenAPI contract export, endpoint inventory grouped by slice, dependency-ordered slice queue/tracker | — |
+| `03_01` | Create Java API Slice Behaviour Doc | Java source for the slice (Controller/Service/Repository/Entity/DTOs), that slice's portion of the `02` contract, existing JUnit tests | Behavior spec markdown (`migration_support/specs/<n>-<slice>-spec.md`) | — |
+| `03_02` | Manual Approve Behaviour Doc | Behavior spec from `03_01` | Tracker status → `Spec Validated`, or → `Rework Needed` back to `03_01` | **manual** |
+| `04_01` | .NET Slice Design Note | Approved spec (`03_02`) + `01`'s conventions | Design note — endpoint route, DTO shapes, service interface signature, EF Core entity changes | — |
+| `04_02` | .NET Slice Generate Code | Design note (`04_01`) + approved spec | Working .NET implementation (Controller, Service impl, EF Core entity/migration, DTOs, validators) | — |
+| `04_03` | .NET Slice Unit Test Code | The approved spec (**not** the generated code) | xUnit/NUnit test suite covering spec rules + edge cases | — |
+| `04_04` | Java/.NET Compare Test Result | `.NET` test results (`04_03` vs `04_02`) + optional Java/.NET side-by-side diff | Pass/fail report + behavioral diff report | — |
+| `04_05` | .NET Code Review | Generated code (`04_02`) + verify results (`04_04`) | Reviewed/approved code | **manual** |
+| `05` | Cross-Cutting & Integration | *TBD* | *TBD* | **partial_manual** |
+| `06` | Validation Strategy | *TBD* | *TBD* | **partial_manual** |
+| `07` | Cutover | *TBD* | *TBD* | **manual** |
+
 ### 01 — Setup .NET Skeleton
-**Input:** target stack preferences, if any (otherwise defaults below). **Output:** `.NET` solution skeleton, ADR doc, cross-cutting scaffolding.
 
 1. Create the target solution structure once, up front, so every migrated module drops into the same shape:
    - `Api` (Controllers/Minimal API endpoints, DI wiring, `Program.cs`)
@@ -87,7 +101,6 @@ flowchart TD
 3. Stand up cross-cutting concerns once: global exception handling, logging (Serilog), auth/JWT validation, health checks, Swagger/OpenAPI, standard response envelope/error format.
 
 ### 02 — Create Java API Contract
-**Input:** running Java app (`java-api/`) with an OpenAPI generator wired up. **Output:** OpenAPI contract export, endpoint inventory grouped by slice, dependency-ordered slice queue/tracker.
 
 Before writing any C#, catalog what exists — this inventory becomes the acceptance spec for the .NET rewrite, i.e. what you check the new code against, not the Java source line-by-line.
 
@@ -105,7 +118,6 @@ In this repo, `02`'s output is exactly `migration_support/dummy-api-contract.txt
 Run once per slice, in `02`'s dependency order.
 
 #### 03_01 — Create Java API Slice Behaviour Doc
-**Input:** Java source for the slice (Controller/Service/Repository/Entity/DTOs), that slice's portion of the `02` contract, existing JUnit tests for the slice. **Output:** behavior spec markdown (`migration_support/specs/<n>-<slice>-spec.md`).
 
 Give Claude the Java file(s) for one slice and ask it to produce a plain-language behavior spec: inputs, outputs, validation, business rules, edge cases, error paths, side effects (DB writes, events published, external calls). Do not ask for code yet — ask for understanding. This is the highest-leverage step in the whole migration; errors here propagate into the rewrite, so it's worth a dedicated toolkit rather than just reading files top to bottom:
 
@@ -137,7 +149,6 @@ Give Claude the Java file(s) for one slice and ask it to produce a plain-languag
 Store these as versioned markdown alongside the code, one file per slice — this becomes both the spec Claude generates the .NET implementation from, and the living documentation that outlives the migration itself.
 
 #### 03_02 — Manual Approve Behaviour Doc *(manual)*
-**Input:** behavior spec from `03_01`. **Output:** tracker status → `Spec Validated`, or corrections requested → back to `03_01` (`Rework Needed`).
 
 Human review and sign-off. No `.NET` code is generated for a slice until this gate passes — errors caught here are cheap to fix; errors caught after `04_02` are not.
 
@@ -145,36 +156,36 @@ Human review and sign-off. No `.NET` code is generated for a slice until this ga
 Run once per slice that has passed `03_02`.
 
 #### 04_01 — .NET Slice Design Note
-**Input:** approved spec (`03_02`) + `01`'s conventions. **Output:** design note — endpoint route, DTO shapes, service interface signature, EF Core entity changes. No method bodies yet; this is contract-level design, not implementation.
+No method bodies yet; this is contract-level design, not implementation.
 
 #### 04_02 — .NET Slice Generate Code
-**Input:** design note (`04_01`) + approved spec. **Output:** working .NET implementation (Controller, Service impl, EF Core entity/migration, DTOs, validators), generated from the *behavior spec* (not a literal line-by-line port), following the `01` conventions.
+Generated from the *behavior spec* (not a literal line-by-line port), following the `01` conventions.
 
 #### 04_03 — .NET Slice Unit Test Code
-**Input:** the approved spec — **not** the generated code, so tests validate against the spec rather than rubber-stamping whatever `04_02` produced. **Output:** xUnit/NUnit test suite covering spec rules and the edge cases identified in `03_01`.
+Tests are prompted from the spec, not the generated code, so they validate against the spec rather than rubber-stamping whatever `04_02` produced.
 
 #### 04_04 — Java/.NET Compare Test Result
-**Input:** `.NET` test results (`04_03` run against `04_02`'s code); optionally, both Java and .NET run side by side against the same inputs (a small script or Postman/Insomnia collection), diffing responses. **Output:** pass/fail report + behavioral diff report.
+Optionally, run both Java and .NET side by side against the same inputs (a small script or Postman/Insomnia collection) and diff the responses.
 
 #### 04_05 — .NET Code Review *(manual)*
-**Input:** generated code (`04_02`) + verify results (`04_04`). **Output:** reviewed/approved code — naming, error handling, security (authz checks preserved?), performance (N+1 queries from EF Core is a common regression point coming from JPA).
+Naming, error handling, security (authz checks preserved?), performance (N+1 queries from EF Core is a common regression point coming from JPA).
 
 Then repeat `03`→`04` for the next slice in `02`'s queue.
 
 ### 05 — Cross-Cutting & Integration *(partial_manual)*
-Once individual slices are migrated, wire up what spans them: shared auth, consistent error envelope, API versioning, rate limiting, logging/correlation IDs, and any inter-service calls. Re-test integration points specifically, since these are where per-slice migration is most likely to silently diverge from the original. Tagged `partial_manual`: much of the cross-cutting code itself is generatable, but re-testing integration across already-migrated slices needs human coordination. *(Full input/output breakdown TBD.)*
+Once individual slices are migrated, wire up what spans them: shared auth, consistent error envelope, API versioning, rate limiting, logging/correlation IDs, and any inter-service calls. Re-test integration points specifically, since these are where per-slice migration is most likely to silently diverge from the original. Tagged `partial_manual`: much of the cross-cutting code itself is generatable, but re-testing integration across already-migrated slices needs human coordination. *(Full input/output breakdown TBD — see table above.)*
 
 ### 06 — Validation Strategy *(partial_manual)*
 - Contract tests against the documented API shape: diff the springdoc-openapi spec captured in `02` against the Swashbuckle-generated spec from the new .NET service (routes, verbs, field names/types, status codes) to catch drift objectively instead of relying on manual comparison.
 - Parallel/shadow run where feasible: route a copy of real traffic to both Java and .NET, compare responses, before cutting over.
 - Load/perf baseline comparison — EF Core and JPA have different default behaviors (lazy loading, query generation); don't assume perf parity without measuring.
 
-Tagged `partial_manual`: contract-diff tooling and test scripts are generatable, but running shadow traffic/load tests against live environments and interpreting results is manual. *(Full input/output breakdown TBD.)*
+Tagged `partial_manual`: contract-diff tooling and test scripts are generatable, but running shadow traffic/load tests against live environments and interpreting results is manual. *(Full input/output breakdown TBD — see table above.)*
 
 ### 07 — Cutover *(manual)*
 Module-by-module traffic shift at the gateway/reverse-proxy level (percentage-based or by route), not a single flip for the whole app. Keep the Java module reachable as a fallback until the .NET replacement has run clean in production for an agreed soak period.
 
-Tagged `manual`: production traffic-shifting, soak-period monitoring, and rollback decisions are operational actions outside what generated code can do. *(Full input/output breakdown TBD.)*
+Tagged `manual`: production traffic-shifting, soak-period monitoring, and rollback decisions are operational actions outside what generated code can do. *(Full input/output breakdown TBD — see table above.)*
 
 ---
 
