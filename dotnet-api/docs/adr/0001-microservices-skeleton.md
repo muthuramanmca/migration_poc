@@ -112,19 +112,28 @@ inside a web service anyway, so splitting out a sixth zero-dependency `BuildingB
 project for one marker attribute wasn't judged worth the added indirection at this stage.
 
 ### Local dev orchestration: .NET Aspire
-`AppHost` orchestrates all 5 services + SQL Server + RabbitMQ. **Confirmed during implementation**:
-this local Windows machine has no Docker, and the AppHost genuinely starts (dashboard comes up,
-resource graph resolves) but fails at container provisioning with `Container runtime 'docker' could
-not be found` — an environment gap, not a wiring bug. Every individual service was instead verified via
-`dotnet build`/`dotnet test` (in-process `WebApplicationFactory` smoke tests, no Docker needed), and the
-Gateway was verified with a direct `dotnet run` + HTTP request. **Running the full AppHost with real
-SQL/RabbitMQ containers still needs to happen somewhere with Docker** — most likely the project's
-established GitHub Codespace pattern (same as `java-api`), not confirmed to have Docker either as of
-this writing.
+`AppHost` orchestrates all 5 services + SQL Server + RabbitMQ. **Confirmed on this local Windows
+machine**: no Docker is available, and the AppHost genuinely starts (dashboard comes up, resource
+graph resolves) but fails at container provisioning with `Container runtime 'docker' could not be
+found` — an environment gap, not a wiring bug. Every individual service was instead verified via
+`dotnet build`/`dotnet test` (in-process `WebApplicationFactory` smoke tests, no Docker needed).
 
-`.devcontainer/devcontainer.json` (under `dotnet-api/`, a sibling to a possible future `java-api/`
-devcontainer) pins the .NET 10 SDK explicitly and includes the `docker-in-docker` feature, closing the
-exact gap that caused the JDK 11-vs-17 mismatch pain when `java-api` was first run in a Codespace.
+**Confirmed end-to-end in a GitHub Codespace built from `dotnet-api/.devcontainer/devcontainer.json`**
+(a new Codespace, distinct from the one already in use for `java-api` — that older one predates this
+devcontainer config and lacks Docker-in-Docker): `dotnet --version` reports `10.0.200`, `docker
+version` succeeds, and `dotnet run` on the AppHost starts all 5 services plus SQL Server and RabbitMQ
+containers with zero manual environment fixing (no repeat of the JDK 11-vs-17 fight `java-api` needed
+— the pinned SDK version closed that gap as intended). Verified via `curl` *inside* the Codespace
+against each service's `localhost` port (bypasses the public `*.app.github.dev` forwarding URL, whose
+DNS can lag for a few minutes right after a brand-new Codespace is created):
+- `curl -sk -L http://localhost:5147/.well-known/jwks.json` → real RS256 JWKS JSON with a populated
+  `keys` array — proves `RsaSigningKeyProvider` and the JWKS endpoint work for real, under real SQL
+  Server, not just in an in-memory test.
+- `curl -sk -L http://localhost:5196/alive` → `200` — Gateway healthy with YARP routing configured
+  against live service-discovery-resolved destinations.
+
+(`-L` follows the `UseHttpsRedirection()` 307 from the HTTP port to HTTPS; `-k` skips the self-signed
+dev certificate.)
 
 ### Deliberately not built now
 - **Redis** — mentioned in the wider migration plan as a future FlightInventory caching /
@@ -166,12 +175,20 @@ runtime (`10.0.8`) rather than a newer patch that might assume a runtime not pre
   MassTransit's in-memory test harness — the saga's states/events/transitions are proven correct, not
   just compiling.
 - Gateway: manually run and confirmed YARP config loads and `/alive` returns `200 Healthy`.
-- AppHost: manually run and confirmed it starts correctly up to the Docker-dependent step.
+- **Full AppHost, in a Docker-enabled GitHub Codespace: all 5 services + SQL Server + RabbitMQ started
+  cleanly; Identity's real JWKS endpoint and Gateway's `/alive` both verified via `curl` against the
+  running containers** (see "Local dev orchestration" above for exact commands/output). This is the
+  strongest verification level in this ADR — real infrastructure, not test doubles or in-memory
+  substitutes.
 
 ## Follow-ups (not part of this ADR's scope)
 
 - Update `dotnet-api/README.md` to describe this structure (done alongside this ADR).
 - Update `CLAUDE.md` / `Java-to-DotNetCore-Migration-Plan.md` to note `dotnet-api/`'s service
   boundaries are an independent airline-domain design, not a 1:1 port of `java-api`'s three slices.
-- Confirm Docker availability in whatever environment will actually run the full AppHost (likely a
-  GitHub Codespace, following the `java-api` pattern) before relying on it for integration testing.
+- ~~Confirm Docker availability in whatever environment will actually run the full AppHost~~ — done;
+  see "Local dev orchestration" above.
+- View the Aspire dashboard itself (not just `curl` the services) to visually confirm every resource's
+  status — blocked so far by the brand-new Codespace's `*.app.github.dev` subdomain not yet resolving
+  in the browser (DNS propagation lag, not an app issue — confirmed via `curl` inside the Codespace
+  instead). Revisit once DNS catches up, or from a different network.
