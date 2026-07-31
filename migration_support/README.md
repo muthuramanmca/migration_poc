@@ -1,28 +1,33 @@
 # Migration Tracker — How This Works
 
-## Files in this folder
+**Status: awaiting regeneration.** `java-api/` was rewritten around 5 airline domains (`identity`,
+`flight`, `booking`, `notification`, `loyalty`) replacing the old `user`/`product`/`order` domain.
+The tracker/inventory/contract/specs below describe the *old* domain and have been moved to
+`archive/` (see `archive/README.md`) as historical reference — they no longer match the current
+source. Fresh versions get created here the next time the `02`→`03` pipeline runs (Phase 2a contract
+export → Phase 2b slice grouping/ordering → per-slice behavior specs).
+
+## Files in this folder (once regenerated)
 
 - **`migration-tracker.csv`** — the file you actually update. One row per **slice**
   (the migration unit — see Phase 2b of the plan: related endpoints sharing a
   Controller/Service/Repository move together, not one by one). This is where
   you pick what's next and mark status.
 - **`api-inventory.csv`** — read-only reference. One row per individual API
-  endpoint (14 total), grouped by slice, pulled directly from the
-  `dummy-api-contract.txt` OpenAPI export. Use it to see exactly which
-  endpoints are inside a slice before selecting it.
-- **`dummy-api-contract.txt`** — the raw OpenAPI contract you exported
+  endpoint, grouped by slice, pulled directly from the OpenAPI export. Use it
+  to see exactly which endpoints are inside a slice before selecting it.
+- **`<app>-contract.txt`** — the raw OpenAPI contract you exported
   (Phase 2a), source of truth for the inventory above.
 - **`specs/`** — will hold one behavior-spec document per slice, created as
-  we migrate each one (doesn't exist yet — created when the first spec is written).
+  we migrate each one.
 
-## Migration order (`02` — dependency-based, already applied in the tracker)
+## Migration order (`02` — dependency-based, to be re-applied for the new domain)
 
-1. **Auth/Users** — foundational, no dependencies. Migrate first.
-2. **Products** — no dependencies on other slices. Can go second (or in
-   parallel with Auth/Users if you wanted, but doing it sequentially keeps
-   review load manageable).
-3. **Orders** — depends on both Auth/Users and Products, since it calls into
-   user identity and product stock. Must go last.
+The new domain's dependency graph (per `dotnet-api/docs/adr/0001-microservices-skeleton.md`'s
+counterpart design) is a diamond, not a line: `identity` (foundational) → `flight` (no deps) →
+`booking` (needs identity+flight) → `loyalty` (needs identity+booking) → `notification` (needs
+booking). Confirm this against the real OpenAPI export when regenerating the tracker, rather than
+assuming it's exactly right — that's what Phase 2a/2b are for.
 
 ## Status values (use these exact strings in the Status column)
 

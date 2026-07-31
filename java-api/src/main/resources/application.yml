@@ -1,8 +1,8 @@
 spring:
   application:
-    name: dummy-api
+    name: java-api
   datasource:
-    url: jdbc:h2:mem:dummydb;DB_CLOSE_DELAY=-1
+    url: jdbc:h2:mem:airlinedb;DB_CLOSE_DELAY=-1
     driver-class-name: org.h2.Driver
     username: sa
     password:
@@ -29,6 +29,9 @@ springdoc:
 # manager (see Section 8 of the migration plan), not application.yml.
 app:
   jwt:
-    secret: "dummy-api-demo-jwt-secret-please-change-in-production-1234567890"
-  products:
-    low-stock-threshold: 10
+    secret: "java-api-demo-jwt-secret-please-change-in-production-1234567890"
+  flights:
+    low-seat-threshold: 10
+  loyalty:
+    silver-threshold: 25000
+    gold-threshold: 50000

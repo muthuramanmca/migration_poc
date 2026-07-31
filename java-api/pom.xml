@@ -16,8 +16,9 @@
     <version>0.1.0</version>
     <name>java-api</name>
     <description>
-        Dummy Spring Boot REST API (Auth/Users, Products, Orders) used as a stand-in
-        source application for the Java -&gt; .NET Core migration process.
+        Airline ticket-booking Spring Boot REST API (Identity, Flights, Bookings,
+        Notifications, Loyalty) used as the source application for the Java -&gt; .NET
+        Core migration process.
     </description>
 
     <properties>

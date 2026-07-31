@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
-  Preview copy of java-api's pom.xml so you can see it without running the
-  scaffold script. Run dummy_api_scaffold.py to materialize the full project
-  (this file plus ~35 Java/config/test files) into a proper Maven layout
-  under java-api/.
+  Preview copy of java-api's pom.xml (kept in sync manually). The full project
+  under java-api/ already exists and is maintained directly -- dummy_api_scaffold.py
+  is now stale (it still generates the old user/product/order domain) and no
+  longer needs to be run against this repo. See dummy_api_scaffold.py's own
+  header comment.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -22,8 +23,9 @@
     <version>0.1.0</version>
     <name>java-api</name>
     <description>
-        Dummy Spring Boot REST API (Auth/Users, Products, Orders) used as a stand-in
-        source application for the Java -&gt; .NET Core migration process.
+        Airline ticket-booking Spring Boot REST API (Identity, Flights, Bookings,
+        Notifications, Loyalty) used as the source application for the Java -&gt; .NET
+        Core migration process.
     </description>
 
     <properties>

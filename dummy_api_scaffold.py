@@ -1,5 +1,14 @@
 #!/usr/bin/env python3
 """
+STALE -- do not run against this repo. Scaffolds the OLD "user/product/order"
+domain this project used before it was rewritten around 5 airline domains
+(identity, flight, booking, notification, loyalty) for the United Airlines
+demo. java-api/ already exists with the current source directly maintained --
+running this script would regenerate the wrong (pre-rename) domain and
+overwrite it. Kept only as a historical reference for the original
+scaffolding approach; see java-api/README.md for the current app.
+
+Original docstring, for reference:
 Scaffolds the "dummy-api" Spring Boot project (Auth/Users, Products, Orders)
 used as the stand-in Java source application for the Java -> .NET Core
 migration plan.
