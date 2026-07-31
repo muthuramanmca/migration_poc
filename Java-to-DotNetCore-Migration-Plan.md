@@ -78,9 +78,9 @@ flowchart TD
 |---|---|---|---|---|
 | `01` | Setup .NET Skeleton | Target stack preferences<br>(otherwise defaults below) | .NET solution skeleton<br>ADR doc<br>Cross-cutting scaffolding | — |
 | `02` | Create Java API Contract | Running `java-api/`<br>with OpenAPI generator wired up | OpenAPI contract export<br>Endpoint inventory (by slice)<br>Dependency-ordered slice queue | — |
-| `03_01` | Create Java API Slice Behaviour Doc | Java source for the slice<br>Slice's portion of `02` contract<br>Existing JUnit tests | Behavior spec markdown<br>(`migration_support/specs/`) | — |
+| `03_01` | Create Java API Slice Behaviour Doc | Java source for the slice<br>Slice's portion of `02` contract<br>Existing JUnit tests | Behavior spec markdown<br>(`migration_support/03_01_java_api_slice_behaviour_doc/`) | — |
 | `03_02` | Manual Approve Behaviour Doc | Behavior spec from `03_01` | Status → `Spec Validated`<br>or → `Rework Needed` | **manual** |
-| `04_01` | .NET Slice Design Note | Approved spec (`03_02`)<br>+ `01`'s conventions | Design note:<br>route, DTOs, service interface,<br>EF Core entity changes | — |
+| `04_01` | .NET Slice Design Note | Approved spec (`03_02`)<br>+ `01`'s conventions | Design note markdown<br>(`migration_support/04_01_net_slice_design_note/`) | — |
 | `04_02` | .NET Slice Generate Code | Design note (`04_01`)<br>+ approved spec | .NET implementation:<br>Controller, Service, EF Core entity,<br>DTOs, validators | — |
 | `04_03` | .NET Slice Unit Test Code | Approved spec<br>(**not** the generated code) | xUnit/NUnit tests<br>(spec rules + edge cases) | — |
 | `04_04` | Java/.NET Compare Test Result | .NET test results<br>+ optional Java/.NET diff | Pass/fail report<br>+ behavioral diff | — |
@@ -117,7 +117,7 @@ Before writing any C#, catalog what exists — this inventory becomes the accept
 
 **Group into slices and sequence them.** The OpenAPI export gives a flat list of endpoints; group them by which Controller/Service/Repository they actually share, since related endpoints (e.g., GET/POST/PUT/DELETE on the same resource) are almost always one slice, not several — migrating them together avoids re-reading the same service class multiple times and keeps shared business rules handled consistently. Then order the slices by dependency, not by list order: foundational modules (auth, users, shared lookups) go first, so that when a dependent module (orders, payments) comes up later, what it calls already exists on the .NET side to build and test against.
 
-In this repo, `02`'s output is exactly `migration_support/dummy-api-contract.txt` (the raw export), `migration_support/api-inventory.csv` (grouped by slice), and `migration_support/migration-tracker.csv` (dependency-ordered queue with status tracking).
+In this repo, `02`'s output is exactly `migration_support/java-api-contract.txt` (the raw export), `migration_support/java-api-inventory.csv` (grouped by slice), and `migration_support/migration-tracker.csv` (dependency-ordered queue with status tracking).
 
 ### 03 — Java API, Slice-Wise
 Run once per slice, in `02`'s dependency order.

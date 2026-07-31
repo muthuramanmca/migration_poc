@@ -5,6 +5,7 @@ java-api/target/
 # .NET (dotnet-api)
 dotnet-api/**/bin/
 dotnet-api/**/obj/
+*.csproj.user
 
 # IDE / editor
 .idea/
