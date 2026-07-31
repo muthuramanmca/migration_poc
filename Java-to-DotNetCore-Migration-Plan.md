@@ -117,7 +117,7 @@ Before writing any C#, catalog what exists — this inventory becomes the accept
 
 **Group into slices and sequence them.** The OpenAPI export gives a flat list of endpoints; group them by which Controller/Service/Repository they actually share, since related endpoints (e.g., GET/POST/PUT/DELETE on the same resource) are almost always one slice, not several — migrating them together avoids re-reading the same service class multiple times and keeps shared business rules handled consistently. Then order the slices by dependency, not by list order: foundational modules (auth, users, shared lookups) go first, so that when a dependent module (orders, payments) comes up later, what it calls already exists on the .NET side to build and test against.
 
-In this repo, `02`'s output is exactly `migration_support/java-api-contract.txt` (the raw export), `migration_support/java-api-inventory.csv` (grouped by slice), and `migration_support/migration-tracker.csv` (dependency-ordered queue with status tracking).
+In this repo, `02`'s output is exactly `migration_support/java-api-contract.txt` (the raw export), `migration_support/java-api-inventory.xlsx` (grouped by slice), and `migration_support/migration-tracker.xlsx` (dependency-ordered queue with status tracking, `Status` column enforced by a dropdown).
 
 ### 03 — Java API, Slice-Wise
 Run once per slice, in `02`'s dependency order.
