@@ -1,0 +1,15 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <ProjectReference Include="..\FlightInventory.Domain\FlightInventory.Domain.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\BuildingBlocks.Common\BuildingBlocks.Common.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\BuildingBlocks.Contracts\BuildingBlocks.Contracts.csproj" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+</Project>

@@ -91,6 +91,11 @@ flowchart TD
 
 ### 01 — Setup .NET Skeleton
 
+**Implemented as:** a microservices architecture (Identity, FlightInventory, Booking, Notification,
+Gateway + shared BuildingBlocks libraries), not the single-solution layout originally sketched below —
+see `dotnet-api/docs/adr/0001-microservices-skeleton.md` for the actual decisions. The layered shape
+described in step 1 still applies, just per-service instead of once for a monolith.
+
 1. Create the target solution structure once, up front, so every migrated module drops into the same shape:
    - `Api` (Controllers/Minimal API endpoints, DI wiring, `Program.cs`)
    - `Application` (services, business logic, DTOs, validators)

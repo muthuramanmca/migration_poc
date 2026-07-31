@@ -1,0 +1,45 @@
+<Solution>
+  <Folder Name="/aspire/">
+    <Project Path="aspire/AppHost/AppHost.csproj" />
+    <Project Path="aspire/ServiceDefaults/ServiceDefaults.csproj" />
+  </Folder>
+  <Folder Name="/building-blocks/">
+    <Project Path="building-blocks/BuildingBlocks.Common/BuildingBlocks.Common.csproj" />
+    <Project Path="building-blocks/BuildingBlocks.Contracts/BuildingBlocks.Contracts.csproj" />
+    <Project Path="building-blocks/BuildingBlocks.Messaging/BuildingBlocks.Messaging.csproj" />
+    <Project Path="building-blocks/BuildingBlocks.Observability/BuildingBlocks.Observability.csproj" />
+    <Project Path="building-blocks/BuildingBlocks.Security/BuildingBlocks.Security.csproj" />
+  </Folder>
+  <Folder Name="/gateway/">
+    <Project Path="gateway/Gateway/Gateway.csproj" />
+  </Folder>
+  <Folder Name="/services/" />
+  <Folder Name="/services/booking/">
+    <Project Path="services/booking/Booking.Api/Booking.Api.csproj" />
+    <Project Path="services/booking/Booking.Application/Booking.Application.csproj" />
+    <Project Path="services/booking/Booking.Domain/Booking.Domain.csproj" />
+    <Project Path="services/booking/Booking.Infrastructure/Booking.Infrastructure.csproj" />
+    <Project Path="services/booking/Booking.Tests/Booking.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/flight-inventory/">
+    <Project Path="services/flight-inventory/FlightInventory.Api/FlightInventory.Api.csproj" />
+    <Project Path="services/flight-inventory/FlightInventory.Application/FlightInventory.Application.csproj" />
+    <Project Path="services/flight-inventory/FlightInventory.Domain/FlightInventory.Domain.csproj" />
+    <Project Path="services/flight-inventory/FlightInventory.Infrastructure/FlightInventory.Infrastructure.csproj" />
+    <Project Path="services/flight-inventory/FlightInventory.Tests/FlightInventory.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/identity/">
+    <Project Path="services/identity/Identity.Api/Identity.Api.csproj" />
+    <Project Path="services/identity/Identity.Application/Identity.Application.csproj" />
+    <Project Path="services/identity/Identity.Domain/Identity.Domain.csproj" />
+    <Project Path="services/identity/Identity.Infrastructure/Identity.Infrastructure.csproj" />
+    <Project Path="services/identity/Identity.Tests/Identity.Tests.csproj" />
+  </Folder>
+  <Folder Name="/services/notification/">
+    <Project Path="services/notification/Notification.Api/Notification.Api.csproj" />
+    <Project Path="services/notification/Notification.Application/Notification.Application.csproj" />
+    <Project Path="services/notification/Notification.Domain/Notification.Domain.csproj" />
+    <Project Path="services/notification/Notification.Infrastructure/Notification.Infrastructure.csproj" />
+    <Project Path="services/notification/Notification.Tests/Notification.Tests.csproj" />
+  </Folder>
+</Solution>

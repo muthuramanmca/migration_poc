@@ -1,0 +1,24 @@
+<Project Sdk="Aspire.AppHost.Sdk/13.4.6">
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\gateway\Gateway\Gateway.csproj" />
+    <ProjectReference Include="..\..\services\identity\Identity.Api\Identity.Api.csproj" />
+    <ProjectReference Include="..\..\services\flight-inventory\FlightInventory.Api\FlightInventory.Api.csproj" />
+    <ProjectReference Include="..\..\services\booking\Booking.Api\Booking.Api.csproj" />
+    <ProjectReference Include="..\..\services\notification\Notification.Api\Notification.Api.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.SqlServer" />
+    <PackageReference Include="Aspire.Hosting.RabbitMQ" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <UserSecretsId>03573c12-d340-4da1-82d2-3dc79adb4cbd</UserSecretsId>
+  </PropertyGroup>
+
+</Project>

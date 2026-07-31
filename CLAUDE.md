@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this repo is
 
-A **Java → .NET Core migration PoC** for United Airlines. The source app is a synthetic Spring Boot 3 REST API (`java-api/`) standing in for a real codebase. The target .NET Core solution lives in the sibling `dotnet-api/` folder (created once code generation begins). The goal is to build a repeatable Claude-assisted migration playbook using a Strangler Fig pattern — one bounded slice at a time, spec-first before any code generation.
+A **Java → .NET Core migration PoC** for United Airlines. The source app is a synthetic Spring Boot 3 REST API (`java-api/`) standing in for a real codebase. The target .NET Core solution lives in the sibling `dotnet-api/` folder. The goal is to build a repeatable Claude-assisted migration playbook using a Strangler Fig pattern — one bounded slice at a time, spec-first before any code generation.
+
+**`dotnet-api/` is a microservices architecture skeleton for the real airline ticket-booking domain — not a 1:1 port of `java-api`'s three slices.** Its service boundaries (Identity, FlightInventory, Booking, Notification, Gateway) were deliberately designed independently of `java-api`'s generic `user`/`product`/`order` shape. See `dotnet-api/docs/adr/0001-microservices-skeleton.md` for the full reasoning. Project structure, DI wiring, and cross-cutting infrastructure (saga, outbox, JWKS, YARP routing) are built and verified; business logic per service still lands through the `02`-`04` pipeline below, same as any other slice.
 
 ---
 
