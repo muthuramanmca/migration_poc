@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 
 namespace Identity.Tests;
@@ -12,7 +13,11 @@ public class JwksEndpointTests(WebApplicationFactory<Program> factory) : IClassF
     [Fact]
     public async Task JwksEndpoint_ReturnsAKeySet()
     {
-        var client = factory.CreateClient();
+        // The dev-only startup migration is switched off -- it would demand a live SQL Server.
+        // This endpoint touches no database.
+        var client = factory
+            .WithWebHostBuilder(builder => builder.UseSetting("RunMigrationsOnStartup", "false"))
+            .CreateClient();
 
         var response = await client.GetAsync("/.well-known/jwks.json");
 

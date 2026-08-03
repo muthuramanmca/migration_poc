@@ -1,7 +1,10 @@
 using BuildingBlocks.Common;
 using BuildingBlocks.Observability;
 using BuildingBlocks.Security;
+using FlightInventory.Api;
+using FlightInventory.Application;
 using FlightInventory.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,10 +12,21 @@ builder.AddServiceDefaults();
 builder.AddBuildingBlocksSerilog(serviceName: "FlightInventory");
 
 builder.Services.AddFlightInventoryInfrastructure(builder.Configuration);
+builder.Services.AddFlightInventoryApplication(builder.Configuration);
 builder.Services.AddBuildingBlocksJwtAuthentication(builder.Configuration);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// Dev-only, matching Identity: a real deployment applies migrations as its own release step, not on
+// app startup. FlightInventory is the second service to actually read/write its database.
+// Switchable off so in-process smoke tests can start the app without a live SQL Server, while still
+// running as Development -- the environment the health endpoints are mapped in.
+if (app.Environment.IsDevelopment() && app.Configuration.GetValue("RunMigrationsOnStartup", true))
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<FlightInventoryDbContext>().Database.MigrateAsync();
+}
 
 app.UseBuildingBlocksCommon();
 
@@ -25,9 +39,7 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-// Real flight/fare/availability endpoints are deferred to FlightInventory's business-logic pass
-// (migration plan steps 02-04 for this slice). This skeleton proves the service starts, the
-// DbContext + outbox + HoldSeat/ReleaseSeat consumers wire up, and auth middleware is in place.
+app.MapFlightEndpoints();
 
 app.MapDefaultEndpoints();
 

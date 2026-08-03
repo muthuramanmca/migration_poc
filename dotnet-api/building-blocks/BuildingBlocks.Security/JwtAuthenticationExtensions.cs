@@ -40,7 +40,13 @@ public static class JwtAuthenticationExtensions
                 };
             });
 
-        services.AddAuthorization();
+        // JwtTokenIssuer mints the role as a ClaimTypes.Role claim, which is also
+        // TokenValidationParameters' default RoleClaimType -- so RequireRole works here with no
+        // extra claim mapping. See BuildingBlocks.Security.AuthorizationPolicies.
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthorizationPolicies.AdminOnly, policy => policy.RequireRole(Roles.Admin));
+        });
 
         return services;
     }

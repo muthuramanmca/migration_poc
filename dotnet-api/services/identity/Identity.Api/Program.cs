@@ -27,7 +27,9 @@ var app = builder.Build();
 // No service in this solution has ever auto-applied EF Core migrations -- fine while every
 // other slice was skeleton-only, but Identity is the first to actually read/write its database.
 // Dev-only: a real deployment applies migrations as its own release step, not on app startup.
-if (app.Environment.IsDevelopment())
+// Switchable off so in-process smoke tests can start the app without a live SQL Server, while still
+// running as Development -- the environment the health endpoints are mapped in.
+if (app.Environment.IsDevelopment() && app.Configuration.GetValue("RunMigrationsOnStartup", true))
 {
     try
     {
