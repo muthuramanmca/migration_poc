@@ -26,8 +26,16 @@ var app = builder.Build();
 // Dev-only: a real deployment applies migrations as its own release step, not on app startup.
 if (app.Environment.IsDevelopment())
 {
-    using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(ex, "Skipping database migrate in Development environment: {Message}", ex.Message);
+    }
 }
 
 app.UseBuildingBlocksCommon();
