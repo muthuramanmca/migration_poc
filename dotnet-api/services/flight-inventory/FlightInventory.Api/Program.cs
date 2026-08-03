@@ -24,8 +24,16 @@ var app = builder.Build();
 // running as Development -- the environment the health endpoints are mapped in.
 if (app.Environment.IsDevelopment() && app.Configuration.GetValue("RunMigrationsOnStartup", true))
 {
-    using var scope = app.Services.CreateScope();
-    await scope.ServiceProvider.GetRequiredService<FlightInventoryDbContext>().Database.MigrateAsync();
+    try
+    {
+        using var scope = app.Services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<FlightInventoryDbContext>().Database.MigrateAsync();
+    }
+    catch (Exception ex)
+    {
+        var logger = app.Services.GetRequiredService<ILogger<Program>>();
+        logger.LogWarning(ex, "Skipping database migrate in Development environment: {Message}", ex.Message);
+    }
 }
 
 app.UseBuildingBlocksCommon();
