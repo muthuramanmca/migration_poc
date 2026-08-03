@@ -10,7 +10,9 @@ var rabbitMq = builder.AddRabbitMQ("RabbitMq");
 
 var identityApi = builder.AddProject<Projects.Identity_Api>("identity-api")
     .WithReference(identityDb)
-    .WaitFor(identityDb);
+    .WithReference(rabbitMq)
+    .WaitFor(identityDb)
+    .WaitFor(rabbitMq);
 
 var flightInventoryApi = builder.AddProject<Projects.FlightInventory_Api>("flight-inventory-api")
     .WithReference(flightInventoryDb)
@@ -33,9 +35,11 @@ var notificationApi = builder.AddProject<Projects.Notification_Api>("notificatio
 // Referencing each *.Api resource here (not just adding them above) is what lets YARP's
 // service-discovery destination resolver in Gateway/appsettings.json ("http://identity-api" etc.)
 // actually resolve at runtime -- Aspire injects the service-discovery env vars this depends on.
-// Note: Gateway's "Identity:Authority" JWT-validation setting is NOT wired through Aspire here --
-// it's still the appsettings.json placeholder, since Identity doesn't issue real tokens yet.
-// That needs real service-discovery-aware wiring once Identity's business-logic pass lands.
+// Note: every service's "Identity:Authority" JWT-validation setting is still the appsettings.json
+// placeholder (https://localhost:7297, matching Identity.Api's real launch port), not wired through
+// Aspire service discovery. That's fine for same-machine dev (this AppHost's port-forwarding keeps
+// that port stable), but won't survive Identity actually moving hosts -- real service-discovery-aware
+// wiring is a follow-up, not part of this slice's 04_02 scope.
 builder.AddProject<Projects.Gateway>("gateway")
     .WithReference(identityApi)
     .WithReference(flightInventoryApi)
