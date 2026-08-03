@@ -41,6 +41,9 @@
     <PackageVersion Include="FluentValidation" Version="12.1.1" />
     <PackageVersion Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.1" />
 
+    <!-- Password hashing (Identity) -->
+    <PackageVersion Include="BCrypt.Net-Next" Version="4.0.3" />
+
     <!-- API versioning -->
     <PackageVersion Include="Asp.Versioning.Http" Version="10.0.1" />
 

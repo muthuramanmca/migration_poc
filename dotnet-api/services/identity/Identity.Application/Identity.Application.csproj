@@ -4,6 +4,7 @@
     <ProjectReference Include="..\Identity.Domain\Identity.Domain.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\BuildingBlocks.Common\BuildingBlocks.Common.csproj" />
     <ProjectReference Include="..\..\..\building-blocks\BuildingBlocks.Contracts\BuildingBlocks.Contracts.csproj" />
+    <ProjectReference Include="..\..\..\building-blocks\BuildingBlocks.Security\BuildingBlocks.Security.csproj" />
   </ItemGroup>
 
   <PropertyGroup>
@@ -11,5 +12,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+    <PackageReference Include="MassTransit" />
+  </ItemGroup>
 
 </Project>

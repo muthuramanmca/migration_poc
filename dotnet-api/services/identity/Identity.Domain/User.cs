@@ -2,11 +2,7 @@ using BuildingBlocks.Common;
 
 namespace Identity.Domain;
 
-/// <summary>
-/// Placeholder entity -- shape only, enough for EF Core migrations to run. Real fields/validation/
-/// behavior land with Identity's actual business-logic pass (registration/login), per the
-/// migration plan's 02-04 per-slice pipeline; this skeleton doesn't implement that logic yet.
-/// </summary>
+/// <summary>Matches behavior spec §3/§4 field-for-field; see this slice's 04_01 design note §3 for the schema rationale.</summary>
 public class User
 {
     public Guid Id { get; set; }

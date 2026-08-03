@@ -1,3 +1,4 @@
+using BuildingBlocks.Messaging;
 using Identity.Application;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -15,7 +16,13 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRefreshTokenRepository, RefreshTokenRepository>();
         services.AddScoped<IMfaChallengeProvider, NoOpMfaChallengeProvider>();
+        services.AddScoped<IPasswordHasher, BCryptPasswordHasher>();
+        services.AddScoped<IJwtTokenIssuer, JwtTokenIssuer>();
         services.AddSingleton<RsaSigningKeyProvider>();
+
+        // Producer only -- Identity has no consumers/sagas of its own, just PassengerRegisteredEvent
+        // published via the outbox registered below (see IdentityDbContext).
+        services.AddBuildingBlocksMessaging<IdentityDbContext>(configuration, _ => { });
 
         return services;
     }
