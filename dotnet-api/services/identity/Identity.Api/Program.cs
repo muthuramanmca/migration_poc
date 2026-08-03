@@ -4,6 +4,7 @@ using BuildingBlocks.Security;
 using Identity.Api;
 using Identity.Application;
 using Identity.Infrastructure;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +20,15 @@ builder.Services.AddBuildingBlocksJwtAuthentication(builder.Configuration);
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
+
+// No service in this solution has ever auto-applied EF Core migrations -- fine while every
+// other slice was skeleton-only, but Identity is the first to actually read/write its database.
+// Dev-only: a real deployment applies migrations as its own release step, not on app startup.
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    await scope.ServiceProvider.GetRequiredService<IdentityDbContext>().Database.MigrateAsync();
+}
 
 app.UseBuildingBlocksCommon();
 
