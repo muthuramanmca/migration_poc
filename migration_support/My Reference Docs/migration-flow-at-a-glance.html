@@ -1,0 +1,215 @@
+<title>Migration Flow — At a Glance</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #F4F6FA;
+    --surface: #FFFFFF;
+    --surface-sunken: #ECF0F6;
+    --ink: #172033;
+    --ink-soft: #52607A;
+    --ink-faint: #8592AA;
+    --line-strong: #C3CBDC;
+    --accent: #1E56B0;
+    --tag-auto: #1E56B0;
+    --tag-partial: #B4740E;
+    --tag-manual: #7A4FC4;
+    --font-display: "Bahnschrift", "Segoe UI Semibold", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --font-body: Charter, "Iowan Old Style", "Georgia Pro", Georgia, "Times New Roman", serif;
+    --font-mono: "Cascadia Code", "Cascadia Mono", Consolas, "SF Mono", "Roboto Mono", monospace;
+    --shadow-card: 0 1px 2px rgba(23, 32, 51, 0.06), 0 8px 24px -12px rgba(23, 32, 51, 0.16);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0D131F; --surface: #151E2E; --surface-sunken: #101725;
+      --ink: #E7ECF6; --ink-soft: #A6B1C6; --ink-faint: #6E7994; --line-strong: #384259;
+      --accent: #6DA1F2; --tag-auto: #6DA1F2; --tag-partial: #E7B04E; --tag-manual: #B79AEF;
+      --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.55);
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0D131F; --surface: #151E2E; --surface-sunken: #101725;
+    --ink: #E7ECF6; --ink-soft: #A6B1C6; --ink-faint: #6E7994; --line-strong: #384259;
+    --accent: #6DA1F2; --tag-auto: #6DA1F2; --tag-partial: #E7B04E; --tag-manual: #B79AEF;
+    --shadow-card: 0 1px 2px rgba(0,0,0,0.3), 0 12px 28px -14px rgba(0,0,0,0.55);
+  }
+  :root[data-theme="light"] {
+    --bg: #F4F6FA; --surface: #FFFFFF; --surface-sunken: #ECF0F6;
+    --ink: #172033; --ink-soft: #52607A; --ink-faint: #8592AA; --line-strong: #C3CBDC;
+    --accent: #1E56B0; --tag-auto: #1E56B0; --tag-partial: #B4740E; --tag-manual: #7A4FC4;
+    --shadow-card: 0 1px 2px rgba(23,32,51,0.06), 0 8px 24px -12px rgba(23,32,51,0.16);
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+  }
+  .page {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: clamp(20px, 4vw, 40px);
+  }
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+  h1 {
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 3.4vw, 2rem);
+    font-weight: 600;
+    margin: 8px 0 6px;
+    letter-spacing: -0.01em;
+  }
+  .subtitle {
+    color: var(--ink-soft);
+    font-size: 0.98rem;
+    max-width: 68ch;
+    margin-bottom: 22px;
+  }
+  .mono { font-family: var(--font-mono); }
+
+  .glance-frame {
+    background: var(--surface);
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+    padding: 20px clamp(10px, 3vw, 24px) 18px;
+    box-shadow: var(--shadow-card);
+    overflow-x: auto;
+  }
+  .glance-frame svg { display: block; margin: 0 auto; max-width: 100%; height: auto; min-width: 640px; }
+
+  .legend-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 16px;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+  }
+  .legend-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-key i { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+  .legend-key i.dashed { border-radius: 0; border: 1.5px dashed var(--ink-faint); background: none; }
+
+  footer {
+    margin-top: 22px;
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+  }
+
+  @media print {
+    @page { size: landscape; margin: 12mm; }
+    body { background: #fff; }
+    .glance-frame { box-shadow: none; }
+  }
+</style>
+
+<div class="page">
+  <div class="eyebrow">Migration Plan · Java Spring Boot → .NET Core</div>
+  <h1>Migration Flow — At a Glance</h1>
+  <p class="subtitle">
+    Proof of concept today; the same plan carries over to the real migration. Start to finish in
+    one image — four checkpoints need a human, everything else is generated.
+  </p>
+
+  <div class="glance-frame">
+    <svg viewBox="0 0 860 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Compact end-to-end migration flow: Java API through setup, contract extraction, a per-slice spec-approval loop, a per-slice design-build-review loop, cross-cutting integration, validation, and cutover to live .NET Core services">
+      <defs>
+        <marker id="glance-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+          <path d="M0,0 L10,5 L0,10 z" fill="var(--line-strong)"></path>
+        </marker>
+      </defs>
+
+      <!-- row 1 -->
+      <line x1="260" y1="80" x2="308" y2="80" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+      <line x1="550" y1="80" x2="598" y2="80" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+      <!-- down: C -> D -->
+      <line x1="720" y1="130" x2="720" y2="248" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+      <!-- row 2 (right to left) -->
+      <line x1="600" y1="300" x2="552" y2="300" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+      <line x1="310" y1="300" x2="262" y2="300" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+      <!-- down: F -> G -->
+      <line x1="140" y1="350" x2="140" y2="468" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+      <!-- row 3 -->
+      <line x1="260" y1="520" x2="308" y2="520" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+      <line x1="550" y1="520" x2="598" y2="520" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+      <!-- A: start -->
+      <rect x="20" y="30" width="240" height="100" rx="10" fill="var(--surface-sunken)" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+      <text x="34" y="54" font-family="var(--font-mono)" font-size="9.5" letter-spacing="0.06em" fill="var(--ink-faint)">START</text>
+      <text x="34" y="78" font-family="var(--font-display)" font-size="15" font-weight="600" fill="var(--ink)">Java API</text>
+      <text x="34" y="98" font-family="var(--font-body)" font-size="11" fill="var(--ink-faint)">Spring Boot, live</text>
+
+      <!-- B: 01 -->
+      <rect x="310" y="30" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-auto)" stroke-width="1.6"></rect>
+      <text x="324" y="54" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">01 · AUTOMATED</text>
+      <text x="324" y="80" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--ink)">Setup .NET Skeleton</text>
+      <text x="324" y="100" font-family="var(--font-body)" font-size="10.5" fill="var(--ink-faint)">once, up front</text>
+
+      <!-- C: 02 -->
+      <rect x="600" y="30" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-auto)" stroke-width="1.6"></rect>
+      <text x="614" y="52" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">02 · AUTOMATED</text>
+      <text x="614" y="74" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Extract Contract,</text>
+      <text x="614" y="90" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Order Slices</text>
+      <text x="614" y="110" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">once, up front</text>
+
+      <!-- D: 03 per-slice spec loop -->
+      <rect x="600" y="250" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-manual)" stroke-width="1.8"></rect>
+      <text x="614" y="272" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">03 · PER-SLICE LOOP</text>
+      <text x="614" y="294" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Draft &amp; Approve Spec</text>
+      <text x="614" y="312" font-family="var(--font-body)" font-size="10.5" fill="var(--ink-soft)">Spec → Approve</text>
+      <text x="614" y="330" font-family="var(--font-mono)" font-size="9" fill="var(--tag-manual)">↻ per domain · 1 gate</text>
+
+      <!-- E: 04 per-slice design/build loop -->
+      <rect x="310" y="250" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-manual)" stroke-width="1.8"></rect>
+      <text x="324" y="272" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">04 · PER-SLICE LOOP</text>
+      <text x="324" y="294" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Design, Build &amp; Review</text>
+      <text x="324" y="312" font-family="var(--font-body)" font-size="9.5" fill="var(--ink-soft)">Design → Approve → Code → Review</text>
+      <text x="324" y="330" font-family="var(--font-mono)" font-size="9" fill="var(--tag-manual)">↻ per domain · 2 gates</text>
+
+      <!-- F: 05 -->
+      <rect x="20" y="250" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-partial)" stroke-width="1.6"></rect>
+      <text x="34" y="272" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">05 · PARTIAL-MANUAL</text>
+      <text x="34" y="296" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--ink)">Cross-Cutting Integration</text>
+      <text x="34" y="316" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">once, after slices exist</text>
+
+      <!-- G: 06 -->
+      <rect x="20" y="470" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-partial)" stroke-width="1.6"></rect>
+      <text x="34" y="492" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">06 · PARTIAL-MANUAL</text>
+      <text x="34" y="516" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--ink)">Validation Strategy</text>
+      <text x="34" y="536" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">once, before cutover</text>
+
+      <!-- H: 07 -->
+      <rect x="310" y="470" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-manual)" stroke-width="1.8"></rect>
+      <text x="324" y="492" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">07 · MANUAL GATE</text>
+      <text x="324" y="516" font-family="var(--font-display)" font-size="15" font-weight="600" fill="var(--ink)">Cutover</text>
+      <text x="324" y="536" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">per domain, gateway-routed</text>
+
+      <!-- I: end -->
+      <rect x="600" y="470" width="240" height="100" rx="10" fill="var(--surface-sunken)" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+      <text x="614" y="494" font-family="var(--font-mono)" font-size="9.5" letter-spacing="0.06em" fill="var(--ink-faint)">END</text>
+      <text x="614" y="518" font-family="var(--font-display)" font-size="15" font-weight="600" fill="var(--ink)">.NET Core</text>
+      <text x="614" y="538" font-family="var(--font-body)" font-size="11" fill="var(--ink-faint)">fully migrated, live</text>
+    </svg>
+
+    <div class="legend-key">
+      <span><i style="background:var(--tag-auto)"></i>Automated</span>
+      <span><i style="background:var(--tag-partial)"></i>Partial-manual</span>
+      <span><i style="background:var(--tag-manual)"></i>Manual gate</span>
+      <span><i class="dashed"></i>Start / end — not a generated step</span>
+    </div>
+  </div>
+
+  <footer>Java-to-DotNetCore-Migration-Plan.md · migration_support/</footer>
+</div>

@@ -62,7 +62,7 @@ flowchart TD
     end
     subgraph P04["04 — .NET API Slice Develop (per approved slice)"]
         direction LR
-        S0401["04_01<br/>Design note"] --> S0402["04_02<br/>Generate code"] --> S0403["04_03<br/>Unit test code"] --> S0404["04_04<br/>Compare Java/.NET results"] --> S0405["04_05<br/>Code review<br/><small>manual</small>"]
+        S0401["04_01<br/>Design note"] --> S0401b["04_01b<br/>Manual approve design note<br/><small>manual</small>"] --> S0402["04_02<br/>Generate code"] --> S0403["04_03<br/>Unit test code"] --> S0404["04_04<br/>Compare Java/.NET results"] --> S0405["04_05<br/>Code review<br/><small>manual</small>"]
     end
     P05["05<br/>Cross-Cutting & Integration<br/><small>partial_manual</small>"]
     P06["06<br/>Validation Strategy<br/><small>partial_manual</small>"]
@@ -81,7 +81,8 @@ flowchart TD
 | `03_01` | Create Java API Slice Behaviour Doc | Java source for the slice<br>Slice's portion of `02` contract<br>Existing JUnit tests | Behavior spec markdown<br>(`migration_support/03_01_java_api_slice_behaviour_doc/`) | — |
 | `03_02` | Manual Approve Behaviour Doc | Behavior spec from `03_01` | Status → `Spec Validated`<br>or → `Rework Needed` | **manual** |
 | `04_01` | .NET Slice Design Note | Approved spec (`03_02`)<br>+ `01`'s conventions | Design note markdown<br>(`migration_support/04_01_net_slice_design_note/`) | — |
-| `04_02` | .NET Slice Generate Code | Design note (`04_01`)<br>+ approved spec | .NET implementation:<br>Controller, Service, EF Core entity,<br>DTOs, validators | — |
+| `04_01b` | Manual Approve Design Note | Design note from `04_01` | Status → `Design Note Ready` reviewed<br>or → rework | **manual** |
+| `04_02` | .NET Slice Generate Code | Approved design note (`04_01b`)<br>+ approved spec | .NET implementation:<br>Controller, Service, EF Core entity,<br>DTOs, validators | — |
 | `04_03` | .NET Slice Unit Test Code | Approved spec<br>(**not** the generated code) | xUnit/NUnit tests<br>(spec rules + edge cases) | — |
 | `04_04` | Java/.NET Compare Test Result | .NET test results<br>+ optional Java/.NET diff | Pass/fail report<br>+ behavioral diff | — |
 | `04_05` | .NET Code Review | Generated code (`04_02`)<br>+ verify results (`04_04`) | Reviewed/approved code | **manual** |
@@ -161,7 +162,11 @@ Human review and sign-off. No `.NET` code is generated for a slice until this ga
 Run once per slice that has passed `03_02`.
 
 #### 04_01 — .NET Slice Design Note
-No method bodies yet; this is contract-level design, not implementation.
+No method bodies yet; this is contract-level design, not implementation. Requires sign-off (`04_01b`) before code generation starts.
+
+#### 04_01b — Manual Approve Design Note *(manual)*
+
+Human review and sign-off, the same gate shape as `03_02` applied one step later. No code is generated for a slice until this passes — catching a wrong architectural call here (API paradigm, entity shape, DI wiring, a pattern that doesn't fit the slice) costs a design-note edit; catching it after `04_02` means throwing away generated code, tests, and a comparison report that all assumed the design was right.
 
 #### 04_02 — .NET Slice Generate Code
 Generated from the *behavior spec* (not a literal line-by-line port), following the `01` conventions.
@@ -209,7 +214,7 @@ To make this concrete, here's the pattern applied to a single typical slice — 
 
 Since Claude is the execution engine for this migration, treat each `03_XX`/`04_XX` step as a distinct prompt, not one mega-prompt:
 
-- Keep `03_01` and `04_02` as separate turns — reviewing the behavior spec before code exists is what catches misread business logic early, when it's cheap to fix.
+- Keep `03_01`, `04_01`, and `04_02` as separate turns — reviewing the behavior spec and then the design note before code exists is what catches misread business logic and wrong architectural calls early, when they're still cheap to fix.
 - Paste the actual Java source for the slice being migrated each time, plus the `01` ADR/conventions doc, so output stays consistent across sessions/slices.
 - Ask explicitly for edge cases and error paths in the behavior spec — these are the most common thing lost in a rewrite.
 - For tests, prompt from the spec, not from "write tests for this code," to avoid tests that just mirror bugs in the generated implementation.

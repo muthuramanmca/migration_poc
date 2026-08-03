@@ -68,8 +68,11 @@ The dependency graph is a diamond, not a line:
 4. You do the manual validation. If something's wrong, tell me what and I set Status back to
    `Rework Needed`, fix it, and resubmit.
 5. Once you confirm it's correct, I set Status to `Spec Validated`.
-6. Once you're ready for the .NET side, I write `04_01_net_slice_design_note/<order>-<slice-name>-design.md`
-   and we continue into `04_02` (generate code) per the migration plan.
+6. Once you're ready for the .NET side, I write `04_01_net_slice_design_note/<order>-<slice-name>-design.md`,
+   set Status to `Design Note Ready`, and post it here for your review.
+7. You review the design note (contract shape, EF Core entities, DI wiring — no method bodies yet).
+   Once you confirm it's correct, we continue into `04_02` (generate code) per the migration plan —
+   the same manual gate shape as the spec's steps 3–5, applied one step later (`04_01b` in the plan).
 
 ### Batch drafting
 

@@ -1,0 +1,859 @@
+<title>Migration Plan - Spec First, Then Code</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  :root {
+    color-scheme: light dark;
+
+    --bg: #F4F6FA;
+    --surface: #FFFFFF;
+    --surface-sunken: #ECF0F6;
+    --ink: #172033;
+    --ink-soft: #52607A;
+    --ink-faint: #8592AA;
+    --line: #DCE2ED;
+    --line-strong: #C3CBDC;
+
+    --accent: #1E56B0;
+    --accent-ink: #ffffff;
+    --accent-soft: #E5EEFC;
+    --accent-soft-line: #C4D7F5;
+
+    --tag-auto: #1E56B0;
+    --tag-auto-soft: #E5EEFC;
+    --tag-partial: #B4740E;
+    --tag-partial-soft: #FBEDD3;
+    --tag-manual: #7A4FC4;
+    --tag-manual-soft: #ECE4FA;
+
+    --risk: #B23A34;
+    --risk-soft: #FBE7E5;
+
+    --font-display: "Bahnschrift", "Segoe UI Semibold", "Arial Narrow", "Helvetica Neue", sans-serif;
+    --font-body: Charter, "Iowan Old Style", "Georgia Pro", Georgia, "Times New Roman", serif;
+    --font-mono: "Cascadia Code", "Cascadia Mono", Consolas, "SF Mono", "Roboto Mono", monospace;
+
+    --shadow-card: 0 1px 2px rgba(23, 32, 51, 0.06), 0 8px 24px -12px rgba(23, 32, 51, 0.16);
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0D131F;
+      --surface: #151E2E;
+      --surface-sunken: #101725;
+      --ink: #E7ECF6;
+      --ink-soft: #A6B1C6;
+      --ink-faint: #6E7994;
+      --line: #29334A;
+      --line-strong: #384259;
+
+      --accent: #6DA1F2;
+      --accent-ink: #0D131F;
+      --accent-soft: #17233B;
+      --accent-soft-line: #2C3F63;
+
+      --tag-auto: #6DA1F2;
+      --tag-auto-soft: #17233B;
+      --tag-partial: #E7B04E;
+      --tag-partial-soft: #3A2C0F;
+      --tag-manual: #B79AEF;
+      --tag-manual-soft: #2A2044;
+
+      --risk: #E28680;
+      --risk-soft: #3A1815;
+
+      --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px -14px rgba(0, 0, 0, 0.55);
+    }
+  }
+
+  :root[data-theme="dark"] {
+    --bg: #0D131F;
+    --surface: #151E2E;
+    --surface-sunken: #101725;
+    --ink: #E7ECF6;
+    --ink-soft: #A6B1C6;
+    --ink-faint: #6E7994;
+    --line: #29334A;
+    --line-strong: #384259;
+
+    --accent: #6DA1F2;
+    --accent-ink: #0D131F;
+    --accent-soft: #17233B;
+    --accent-soft-line: #2C3F63;
+
+    --tag-auto: #6DA1F2;
+    --tag-auto-soft: #17233B;
+    --tag-partial: #E7B04E;
+    --tag-partial-soft: #3A2C0F;
+    --tag-manual: #B79AEF;
+    --tag-manual-soft: #2A2044;
+
+    --risk: #E28680;
+    --risk-soft: #3A1815;
+
+    --shadow-card: 0 1px 2px rgba(0, 0, 0, 0.3), 0 12px 28px -14px rgba(0, 0, 0, 0.55);
+  }
+
+  :root[data-theme="light"] {
+    --bg: #F4F6FA;
+    --surface: #FFFFFF;
+    --surface-sunken: #ECF0F6;
+    --ink: #172033;
+    --ink-soft: #52607A;
+    --ink-faint: #8592AA;
+    --line: #DCE2ED;
+    --line-strong: #C3CBDC;
+
+    --accent: #1E56B0;
+    --accent-ink: #ffffff;
+    --accent-soft: #E5EEFC;
+    --accent-soft-line: #C4D7F5;
+
+    --tag-auto: #1E56B0;
+    --tag-auto-soft: #E5EEFC;
+    --tag-partial: #B4740E;
+    --tag-partial-soft: #FBEDD3;
+    --tag-manual: #7A4FC4;
+    --tag-manual-soft: #ECE4FA;
+
+    --risk: #B23A34;
+    --risk-soft: #FBE7E5;
+
+    --shadow-card: 0 1px 2px rgba(23, 32, 51, 0.06), 0 8px 24px -12px rgba(23, 32, 51, 0.16);
+  }
+
+  * { box-sizing: border-box; }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    font-size: 16px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; animation: none !important; }
+  }
+
+  h1, h2, h3 { font-family: var(--font-display); color: var(--ink); text-wrap: balance; margin: 0; }
+
+  .eyebrow {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  p { margin: 0; }
+
+  .prose { max-width: 62ch; color: var(--ink-soft); }
+  .prose strong { color: var(--ink); font-weight: 600; }
+
+  code, .mono { font-family: var(--font-mono); }
+
+  /* ---------- layout shells ---------- */
+
+  .wrap {
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 0 clamp(20px, 4vw, 56px);
+  }
+
+  header.masthead {
+    padding: clamp(48px, 8vw, 84px) 0 40px;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .masthead h1 {
+    font-size: clamp(2.1rem, 4.4vw, 3.4rem);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    margin-top: 10px;
+    max-width: 26ch;
+  }
+
+  .masthead__subtitle {
+    margin-top: 18px;
+    font-size: 1.08rem;
+    max-width: none;
+  }
+
+  .stat-row {
+    display: flex;
+    gap: clamp(20px, 3vw, 40px);
+    margin-top: 32px;
+    flex-wrap: wrap;
+  }
+
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .stat b {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .stat span {
+    font-size: 0.76rem;
+    color: var(--ink-faint);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  nav.toc {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: color-mix(in srgb, var(--bg) 88%, transparent);
+    backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--line);
+  }
+
+  nav.toc ul {
+    list-style: none;
+    display: flex;
+    gap: clamp(4px, 2vw, 8px);
+    margin: 0;
+    padding: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+  nav.toc ul::-webkit-scrollbar { display: none; }
+
+  nav.toc a {
+    display: inline-block;
+    white-space: nowrap;
+    padding: 14px 14px;
+    font-family: var(--font-mono);
+    font-size: 0.82rem;
+    letter-spacing: 0.02em;
+    color: var(--ink-soft);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  nav.toc a:hover { color: var(--ink); }
+  nav.toc a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: -2px;
+    border-radius: 3px;
+  }
+
+  section {
+    padding: clamp(44px, 7vw, 76px) 0;
+    border-bottom: 1px solid var(--line);
+    scroll-margin-top: 52px;
+  }
+  section:last-of-type { border-bottom: none; }
+
+  .section-head {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 34px;
+  }
+
+  .section-head h2 {
+    font-size: clamp(1.5rem, 2.6vw, 2.05rem);
+    font-weight: 600;
+  }
+
+  .section-head .prose { margin-top: 4px; }
+
+  /* ---------- pill (process-nature tag, not live status) ---------- */
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    padding: 4px 10px;
+    border-radius: 100px;
+    white-space: nowrap;
+  }
+  .pill::before {
+    content: "";
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+    flex: none;
+  }
+  .pill--auto { background: var(--tag-auto-soft); color: var(--tag-auto); }
+  .pill--partial { background: var(--tag-partial-soft); color: var(--tag-partial); }
+  .pill--manual { background: var(--tag-manual-soft); color: var(--tag-manual); }
+
+  .legend-key {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px;
+    margin-top: 18px;
+    font-size: 0.82rem;
+    color: var(--ink-faint);
+  }
+  .legend-key span { display: inline-flex; align-items: center; gap: 6px; }
+  .legend-key i {
+    width: 8px; height: 8px; border-radius: 50%; display: inline-block;
+  }
+  .legend-key i.dashed {
+    border-radius: 0; border: 1.5px dashed var(--ink-faint); background: none;
+  }
+
+  /* ---------- at-a-glance flow diagram ---------- */
+
+  .glance-frame {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 14px;
+    padding: 22px clamp(12px, 3vw, 28px) 20px;
+    box-shadow: var(--shadow-card);
+    overflow-x: auto;
+  }
+
+  .glance-frame svg { display: block; margin: 0 auto; max-width: 100%; height: auto; min-width: 640px; }
+
+  /* ---------- migration highlights ---------- */
+
+  .highlight-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
+  @media (max-width: 900px) { .highlight-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 600px) { .highlight-grid { grid-template-columns: 1fr; } }
+
+  .highlight-card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent);
+    border-radius: 10px;
+    padding: 16px 18px;
+    box-shadow: var(--shadow-card);
+  }
+
+  .highlight-card h3 {
+    font-size: 0.96rem;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+
+  .highlight-card p {
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    margin: 0;
+  }
+
+  /* ---------- pipeline stepper (vertical — the flow reads top to bottom) ---------- */
+
+  .stepper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .stepper::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    bottom: 20px;
+    left: 19px;
+    width: 2px;
+    background: var(--line-strong);
+    z-index: 0;
+  }
+
+  .phase {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: flex-start;
+    gap: 20px;
+  }
+
+  .phase__node {
+    flex: none;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 2px solid var(--line-strong);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-mono);
+    font-weight: 700;
+    font-size: 0.85rem;
+    color: var(--ink-soft);
+  }
+
+  .phase__card {
+    flex: 1;
+    min-width: 0;
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    padding: 18px 20px 20px;
+    box-shadow: var(--shadow-card);
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .phase__head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .phase__freq {
+    font-family: var(--font-mono);
+    font-size: 0.66rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+  }
+
+  .phase__name {
+    font-family: var(--font-display);
+    font-size: 1.08rem;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+
+  .phase__desc {
+    font-size: 0.9rem;
+    color: var(--ink-soft);
+    line-height: 1.5;
+    max-width: 62ch;
+  }
+
+  .subloop {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 2px;
+  }
+
+  .subchip {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: var(--surface-sunken);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.78rem;
+  }
+
+  .subchip .mono { font-size: 0.72rem; color: var(--ink-faint); }
+  .subchip .arrow { color: var(--ink-faint); }
+
+  .subloop-note {
+    font-size: 0.8rem;
+    color: var(--ink-faint);
+    font-style: italic;
+    margin-top: 2px;
+  }
+
+  .pipeline-note {
+    margin-top: 22px;
+    font-size: 0.85rem;
+    color: var(--ink-faint);
+    max-width: 70ch;
+  }
+
+  /* ---------- footer ---------- */
+
+  footer {
+    padding: 32px 0 56px;
+  }
+
+  .file-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+  }
+
+  .file-chip {
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    background: var(--surface-sunken);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 5px 10px;
+    color: var(--ink-soft);
+  }
+
+  footer .prose { font-size: 0.85rem; margin-top: 18px; }
+</style>
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="eyebrow">Migration Playbook · Java Spring Boot → .NET Core</div>
+    <h1>Migration Plan - Spec First, Then Code</h1>
+    <p class="masthead__subtitle">
+      This is a proof of concept: a synthetic Spring Boot API stands in for United's real booking
+      platform, since no live codebase exists yet. The plan itself doesn't change when that does —
+      the same steps carry over to the real migration, one bounded domain at a time —
+      <strong>Identity, Flight, Booking, Loyalty, Notification</strong> — so nothing is ever a
+      big-bang cutover, and a wrong assumption gets caught on paper, while it's still cheap to fix,
+      not after it's shipped.
+    </p>
+    <div class="stat-row">
+      <div class="stat"><b>4</b><span>manual approval gates</span></div>
+      <div class="stat"><b>2</b><span>stacks bridged, Java ⇄ .NET</span></div>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="wrap">
+    <ul>
+      <li><a href="#glance">At a Glance</a></li>
+      <li><a href="#workflow">The Workflow</a></li>
+      <li><a href="#strategy">Strategy</a></li>
+      <li><a href="#highlights">Highlights</a></li>
+    </ul>
+  </div>
+</nav>
+
+<main>
+
+  <section id="glance">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">The complete flow, one page</div>
+      <h2>At a Glance</h2>
+      <p class="prose">Start to finish in one image — the detail behind every box follows below.</p>
+    </div>
+
+    <div class="glance-frame">
+      <svg viewBox="0 0 860 600" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Compact end-to-end migration flow: Java API through setup, contract extraction, a per-slice spec-approval loop, a per-slice design-build-review loop, cross-cutting integration, validation, and cutover to live .NET Core services">
+        <defs>
+          <marker id="glance-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="var(--line-strong)"></path>
+          </marker>
+        </defs>
+
+        <!-- row 1 -->
+        <line x1="260" y1="80" x2="308" y2="80" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+        <line x1="550" y1="80" x2="598" y2="80" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+        <!-- down: C -> D -->
+        <line x1="720" y1="130" x2="720" y2="248" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+        <!-- row 2 (right to left) -->
+        <line x1="600" y1="300" x2="552" y2="300" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+        <line x1="310" y1="300" x2="262" y2="300" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+        <!-- down: F -> G -->
+        <line x1="140" y1="350" x2="140" y2="468" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+        <!-- row 3 -->
+        <line x1="260" y1="520" x2="308" y2="520" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+        <line x1="550" y1="520" x2="598" y2="520" stroke="var(--line-strong)" stroke-width="1.5" marker-end="url(#glance-arrow)"></line>
+
+        <!-- A: start -->
+        <rect x="20" y="30" width="240" height="100" rx="10" fill="var(--surface-sunken)" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+        <text x="34" y="54" font-family="var(--font-mono)" font-size="9.5" letter-spacing="0.06em" fill="var(--ink-faint)">START</text>
+        <text x="34" y="78" font-family="var(--font-display)" font-size="15" font-weight="600" fill="var(--ink)">Java API</text>
+        <text x="34" y="98" font-family="var(--font-body)" font-size="11" fill="var(--ink-faint)">Spring Boot, live</text>
+
+        <!-- B: 01 -->
+        <rect x="310" y="30" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-auto)" stroke-width="1.6"></rect>
+        <text x="324" y="54" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">01 · AUTOMATED</text>
+        <text x="324" y="80" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--ink)">Setup .NET Skeleton</text>
+        <text x="324" y="100" font-family="var(--font-body)" font-size="10.5" fill="var(--ink-faint)">once, up front</text>
+
+        <!-- C: 02 -->
+        <rect x="600" y="30" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-auto)" stroke-width="1.6"></rect>
+        <text x="614" y="52" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">02 · AUTOMATED</text>
+        <text x="614" y="74" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Extract Contract,</text>
+        <text x="614" y="90" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Order Slices</text>
+        <text x="614" y="110" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">once, up front</text>
+
+        <!-- D: 03 per-slice spec loop -->
+        <rect x="600" y="250" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-manual)" stroke-width="1.8"></rect>
+        <text x="614" y="272" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">03 · PER-SLICE LOOP</text>
+        <text x="614" y="294" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Draft &amp; Approve Spec</text>
+        <text x="614" y="312" font-family="var(--font-body)" font-size="10.5" fill="var(--ink-soft)">Spec → Approve</text>
+        <text x="614" y="330" font-family="var(--font-mono)" font-size="9" fill="var(--tag-manual)">↻ per domain · 1 gate</text>
+
+        <!-- E: 04 per-slice design/build loop -->
+        <rect x="310" y="250" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-manual)" stroke-width="1.8"></rect>
+        <text x="324" y="272" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">04 · PER-SLICE LOOP</text>
+        <text x="324" y="294" font-family="var(--font-display)" font-size="13.5" font-weight="600" fill="var(--ink)">Design, Build &amp; Review</text>
+        <text x="324" y="312" font-family="var(--font-body)" font-size="9.5" fill="var(--ink-soft)">Design → Approve → Code → Review</text>
+        <text x="324" y="330" font-family="var(--font-mono)" font-size="9" fill="var(--tag-manual)">↻ per domain · 2 gates</text>
+
+        <!-- F: 05 -->
+        <rect x="20" y="250" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-partial)" stroke-width="1.6"></rect>
+        <text x="34" y="272" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">05 · PARTIAL-MANUAL</text>
+        <text x="34" y="296" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--ink)">Cross-Cutting Integration</text>
+        <text x="34" y="316" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">once, after slices exist</text>
+
+        <!-- G: 06 -->
+        <rect x="20" y="470" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-partial)" stroke-width="1.6"></rect>
+        <text x="34" y="492" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">06 · PARTIAL-MANUAL</text>
+        <text x="34" y="516" font-family="var(--font-display)" font-size="14" font-weight="600" fill="var(--ink)">Validation Strategy</text>
+        <text x="34" y="536" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">once, before cutover</text>
+
+        <!-- H: 07 -->
+        <rect x="310" y="470" width="240" height="100" rx="10" fill="var(--surface)" stroke="var(--tag-manual)" stroke-width="1.8"></rect>
+        <text x="324" y="492" font-family="var(--font-mono)" font-size="9.5" fill="var(--ink-faint)">07 · MANUAL GATE</text>
+        <text x="324" y="516" font-family="var(--font-display)" font-size="15" font-weight="600" fill="var(--ink)">Cutover</text>
+        <text x="324" y="536" font-family="var(--font-body)" font-size="10" fill="var(--ink-faint)">per domain, gateway-routed</text>
+
+        <!-- I: end -->
+        <rect x="600" y="470" width="240" height="100" rx="10" fill="var(--surface-sunken)" stroke="var(--line-strong)" stroke-width="1.5" stroke-dasharray="4 3"></rect>
+        <text x="614" y="494" font-family="var(--font-mono)" font-size="9.5" letter-spacing="0.06em" fill="var(--ink-faint)">END</text>
+        <text x="614" y="518" font-family="var(--font-display)" font-size="15" font-weight="600" fill="var(--ink)">.NET Core</text>
+        <text x="614" y="538" font-family="var(--font-body)" font-size="11" fill="var(--ink-faint)">fully migrated, live</text>
+      </svg>
+
+      <div class="legend-key">
+        <span><i style="background:var(--tag-auto)"></i>Automated</span>
+        <span><i style="background:var(--tag-partial)"></i>Partial-manual</span>
+        <span><i style="background:var(--tag-manual)"></i>Manual gate</span>
+        <span><i class="dashed"></i>Start / end — not a generated step</span>
+      </div>
+    </div>
+  </div>
+  </section>
+
+  <section id="workflow">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">How a slice moves, start to finish</div>
+        <h2>Seven Phases, Two Loops</h2>
+        <p class="prose">
+          Phases <span class="mono">01</span> and <span class="mono">02</span> set up the whole
+          app once. Everything from <span class="mono">03</span> onward is a loop that repeats
+          per domain, in whichever dependency order <span class="mono">02</span> fixed — so a
+          slice never starts drafting before what it depends on already exists to build against.
+        </p>
+      </div>
+
+      <div class="stepper">
+
+        <div class="phase">
+          <div class="phase__node">01</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs once</span>
+              <span class="pill pill--auto">Automated</span>
+            </div>
+            <div class="phase__name">Setup .NET Skeleton</div>
+            <p class="phase__desc">
+              Solution layout, conventions, and cross-cutting scaffolding — decided once, for
+              every service that follows.
+            </p>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase__node">02</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs once</span>
+              <span class="pill pill--auto">Automated</span>
+            </div>
+            <div class="phase__name">Create Java API Contract</div>
+            <p class="phase__desc">
+              Extract the OpenAPI contract from <span class="mono">java-api</span>, group its
+              routes into slices, and order those slices by dependency.
+            </p>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase__node">03</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs per slice</span>
+            </div>
+            <div class="phase__name">Java API, Slice-Wise</div>
+            <p class="phase__desc">Understand a slice's behavior before anyone writes a line of C#.</p>
+            <div class="subloop">
+              <span class="subchip"><span class="mono">03_01</span> Draft spec <span class="pill pill--auto" style="margin-left:2px">Automated</span></span>
+              <span class="arrow">→</span>
+              <span class="subchip"><span class="mono">03_02</span> Sign off <span class="pill pill--manual" style="margin-left:2px">Manual gate</span></span>
+            </div>
+            <p class="subloop-note">
+              Repeats independently for every slice — each domain moves through this loop on its
+              own timeline, not all five at once.
+            </p>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase__node">04</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs per slice, once approved</span>
+            </div>
+            <div class="phase__name">.NET API Slice Develop</div>
+            <p class="phase__desc">Turn an approved spec into reviewed, tested .NET code.</p>
+            <div class="subloop">
+              <span class="subchip"><span class="mono">04_01</span> Design note <span class="pill pill--auto" style="margin-left:2px">Automated</span></span>
+              <span class="arrow">→</span>
+              <span class="subchip">Approve design <span class="pill pill--manual" style="margin-left:2px">Manual gate</span></span>
+              <span class="arrow">→</span>
+              <span class="subchip"><span class="mono">04_02</span> Generate code <span class="pill pill--auto" style="margin-left:2px">Automated</span></span>
+              <span class="arrow">→</span>
+              <span class="subchip"><span class="mono">04_03</span> Write tests <span class="pill pill--auto" style="margin-left:2px">Automated</span></span>
+              <span class="arrow">→</span>
+              <span class="subchip"><span class="mono">04_04</span> Compare vs Java <span class="pill pill--auto" style="margin-left:2px">Automated</span></span>
+              <span class="arrow">→</span>
+              <span class="subchip"><span class="mono">04_05</span> Code review <span class="pill pill--manual" style="margin-left:2px">Manual gate</span></span>
+            </div>
+            <p class="subloop-note">No code is generated until the design note is approved — the same "cheap to fix on paper" logic as the spec gate. Tests are then prompted from the spec, not the generated code, so they can't rubber-stamp a bug the rewrite introduced.</p>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase__node">05</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs once, after slices exist</span>
+              <span class="pill pill--partial">Partial-manual</span>
+            </div>
+            <div class="phase__name">Cross-Cutting &amp; Integration</div>
+            <p class="phase__desc">Shared auth, error envelope, correlation IDs, inter-service calls — re-tested once enough slices exist to wire together.</p>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase__node">06</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs once, before cutover</span>
+              <span class="pill pill--partial">Partial-manual</span>
+            </div>
+            <div class="phase__name">Validation Strategy</div>
+            <p class="phase__desc">Contract diff against the Java spec, shadow traffic, and a load/perf baseline before anyone trusts the new stack.</p>
+          </div>
+        </div>
+
+        <div class="phase">
+          <div class="phase__node">07</div>
+          <div class="phase__card">
+            <div class="phase__head">
+              <span class="phase__freq">Runs per slice</span>
+              <span class="pill pill--manual">Manual gate</span>
+            </div>
+            <div class="phase__name">Cutover</div>
+            <p class="phase__desc">Module-by-module traffic shift at the gateway. Java stays live as fallback through a soak period.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="legend-key">
+        <span><i style="background:var(--tag-auto)"></i>Automated — Claude drafts it, nothing to type by hand</span>
+        <span><i style="background:var(--tag-partial)"></i>Partial-manual — generatable in part, human coordination for the rest</span>
+        <span><i style="background:var(--tag-manual)"></i>Manual gate — a human has to act before anything moves on</span>
+      </div>
+    </div>
+  </section>
+
+  <section id="strategy">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Why it's built this way</div>
+        <h2>Strangler Fig, Spec First</h2>
+      </div>
+
+      <div class="strategy-grid" style="display:grid; grid-template-columns: repeat(2, 1fr); gap: 28px 40px; margin-bottom: 40px;">
+        <div>
+          <h3 style="font-size:1.05rem; margin-bottom:8px;">Strangler Fig, not big-bang</h3>
+          <p class="prose">
+            The Java app keeps running the whole time. Each domain gets rebuilt in .NET Core
+            behind the same gateway route prefix, then only that domain's traffic is cut over.
+            A defect in one freshly migrated slice never takes four still-healthy ones down
+            with it.
+          </p>
+        </div>
+        <div>
+          <h3 style="font-size:1.05rem; margin-bottom:8px;">One slice, fully proven, before the next</h3>
+          <p class="prose">
+            A slice is a full vertical — Controller → Service → Repository → Entity — not a
+            whole architectural layer. One domain is migrated, tested, and signed off end-to-end
+            before the next domain's spec even starts drafting, so a wrong assumption surfaces
+            while it's still cheap to fix.
+          </p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="highlights">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="eyebrow">Why this approach, in short</div>
+        <h2>Migration Highlights</h2>
+      </div>
+
+      <div class="highlight-grid">
+        <div class="highlight-card">
+          <h3>AI used end-to-end, not just codegen</h3>
+          <p>Specs, design notes, tests, and Java/.NET comparisons are all drafted by Claude — code generation is one step of five, not the whole job.</p>
+        </div>
+        <div class="highlight-card">
+          <h3>Cost savings</h3>
+          <p>Most artifacts are generated, not billed as manual engineering hours — spec-writing and test-writing included.</p>
+        </div>
+        <div class="highlight-card">
+          <h3>Effort savings</h3>
+          <p>Engineers review and approve; they don't hand-write boilerplate or re-discover business rules buried in old code.</p>
+        </div>
+        <div class="highlight-card">
+          <h3>Mistakes caught on paper</h3>
+          <p>A misread business rule costs a paragraph edit in a spec. Caught after code exists, the same mistake costs a rewrite — and a production incident to find it.</p>
+        </div>
+        <div class="highlight-card">
+          <h3>Controlled migration, manual gates</h3>
+          <p>Four checkpoints — spec approval, design approval, code review, cutover — keep every AI-generated step accountable to a human.</p>
+        </div>
+        <div class="highlight-card">
+          <h3>Migration happening gradually</h3>
+          <p>One domain cuts over at a time; the old system keeps running until each one is proven — never a single high-stakes flip.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="eyebrow">Reference</div>
+    <p class="prose" style="margin-top:8px">
+      This page describes the plan, not any one slice's progress against it.
+    </p>
+    <div class="file-chips">
+      <span class="file-chip">Java-to-DotNetCore-Migration-Plan.md</span>
+      <span class="file-chip">dotnet-api/docs/adr/0001-microservices-skeleton.md</span>
+    </div>
+  </div>
+</footer>
