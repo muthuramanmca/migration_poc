@@ -17,6 +17,9 @@ builder.Services.AddIdentityApplication();
 // Identity is both the token issuer (below) and, for /me, a resource server -- ADR 0001's
 // zero-trust rule says every service validates independently, Identity included.
 builder.Services.AddBuildingBlocksJwtAuthentication(builder.Configuration);
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 builder.Services.AddOpenApi();
 
 var app = builder.Build();
@@ -42,6 +45,11 @@ app.UseBuildingBlocksCommon();
 
 if (app.Environment.IsDevelopment())
 {
+    app.UseSwagger();
+    app.UseSwaggerUI(c =>
+    {
+        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Identity API v1");
+    });
     app.MapOpenApi();
 }
 
